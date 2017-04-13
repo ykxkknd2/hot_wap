@@ -1,0 +1,18 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    {{#if assetsData.page.css}}
+    <link rel="stylesheet" href="{{assetsData.page.css}}"/>
+    {{/if}}
+</head>
+<body>
+{{{body}}}
+
+{{#if assetsData.page.js}}
+<script type="text/javascript" src="{{assetsData.manifest}}"></script>
+<script type="text/javascript" src="{{assetsData.vendor}}"></script>
+<script type="text/javascript" src="{{assetsData.page.js}}"></script>
+{{/if}}
+</body>
+</html>
