@@ -9,7 +9,6 @@ window.vue = new Vue({
   el: '#app',
   render: h => h(App),
     mounted (){
-      debugger;
         console.log($('ul').length,111)
     }
 });

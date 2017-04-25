@@ -20,9 +20,8 @@
     <!--</ul>-->
   <!--</div>-->
 
-  <div id="app">
-    <test v-for="item in items" :item="item"></test>
-    <button @click="add">add</button>
+  <div id="app" >
+    <test v-for="item in items" :item="item" :keyword="keyword"></test>
     <input>
   </div>
 </template>
@@ -31,35 +30,53 @@
     import $ from 'jQuery';
     import test from './components/test.vue';
 
+    var win = $(window),
+        _winHeight = win.height(),
+        _isLoading = false,
+        _docHeight;
+    const getDataHeight = 500;
+
     var App = {
         name: 'app',
         data () {
             return {
-               msg: 'Welcome to Your Vue.js App',
+               keyword : '',
                items : []
             }
         },
         created () {
-            $(window).bind('popstate', function(event){
-                console.log('popstate',event);
-            });
-            setTimeout(function(){
-                this.items.push({title:'http://www.baidu.com',id:1})
-                this.items.push({title:'http://www.sohu.com',id:2})
-                this.items.push({title:'http://www.sina.com',id:3})
-            }.bind(this),500)
+            this.keyword = '二';
+            this.getData();
         },
         mounted (){
-//            $(window).scroll(function(){
-//                console.log($(window).scrollTop());
-//                //ajax getData and push into items
-//            });
+            window.sogou.pb.pv();
+
+            win.scroll(()=>{
+                if(win.scrollTop() >= _docHeight - _winHeight - getDataHeight){
+                    this.getData();
+                }
+            });
+
+            win.resize(()=>{
+                _winHeight = win.height();
+            });
         },
         methods : {
-            add (){
-                this.items.reverse();
-                this.items.unshift({title:4})
-                this.items.unshift({title:5})
+            getData (){
+                if(!_isLoading){
+                    _isLoading = true;
+                    $.ajax({
+                        url : '/api/name',
+                        dataType : 'json',
+                        success : (json)=>{
+                            this.$data.items = json.rec_1.rec.concat(this.$data.items);
+                            this.$nextTick(function(){
+                                _docHeight = $(document).height();
+                                _isLoading = false;
+                            })
+                        }
+                    })
+                }
             }
         },
         components: {

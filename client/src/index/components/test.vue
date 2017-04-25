@@ -1,28 +1,32 @@
 <template>
-    <a class="ykx" @click="pushHistory" :href="item.title" :data-id="item.id">{{item.title}}</a>
+    <div class="ykx">
+        <a href="http://www.baidu.com" v-html="title"></a>
+    </div>
 </template>
 
 <style>
     .ykx{
         border: 1px solid;
         width : 100px;
-        height: 300px;
+        height: 100px;
     }
 </style>
 
 <script>
     export default {
         name : 'test',
-        props : ['item'],
+        props : ['item','keyword'],
         data : function(){
             return {
             }
         },
         methods : {
             pushHistory : function(){
-//                debugger;
-                history.replaceState({dataId:this.$el.getAttribute('data-id')},'');
-//                window.open()
+            }
+        },
+        computed : {
+            title: function(){
+                return this.item.pidtitle.replace(this.keyword,'<span style="color:red">' + this.keyword + '</span>');
             }
         }
     }

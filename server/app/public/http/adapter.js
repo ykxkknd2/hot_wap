@@ -3,6 +3,7 @@
  */
 var _ = require('lodash'),
     http = require('http'),
+    log = require('../log'),
     url = require('url');
 
 /**
@@ -54,7 +55,7 @@ Adapter.prototype.client = function() {
         var size = 0;
         if (response.statusCode && response.statusCode != 200) {
 
-            console.error("error", 'http:' + method + ":::::" + interface_url + " error:net occur error:statusCode is not 200 ...,it is " + response.statusCode);
+            log.error("error", 'http:' + method + ":::::" + interface_url + " error:net occur error:statusCode is not 200 ...,it is " + response.statusCode);
             if (!send) {
                 send = true;
                 return callback(new Error("状态码异常"));
@@ -66,7 +67,7 @@ Adapter.prototype.client = function() {
         });
         response.on('end', function() {
             var overTime = Date.now() - begin.getTime();
-            console.log('http:' + method + ":::::"+ interface_url + " is ok... -----", overTime + "ms");
+            log.info('http:' + method + ":::::"+ interface_url + " is ok... -----", overTime + "ms");
             if (!send) {
                 send = true;
                 resText = Buffer.concat(resText, size);

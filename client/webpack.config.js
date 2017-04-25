@@ -3,27 +3,13 @@ var webpack = require('webpack');
 var fs = require('fs');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var AssetsPlugin = require('assets-webpack-plugin');
+var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 var glob = require('glob');
+var rimraf = require('rimraf');
 var isProduction = process.env.NODE_ENV === 'production';
 
-var deleteFolderRecursive = function(path,rmDir) {
-    var files = [];
-    if( fs.existsSync(path) ) {
-        files = fs.readdirSync(path);
-        files.forEach(function(file,index){
-            var curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()) {
-                deleteFolderRecursive(curPath,true);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        if(rmDir)  fs.rmdirSync(path);
-    }
-};
-
 var config = {
-  entry: {vendor: ['vue', 'jquery']},
+  entry: {vendor: ['vue', 'jquery'],pb_args:'./src/public/pb_args.js'},
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
@@ -79,13 +65,15 @@ var config = {
   plugins : [
       new AssetsPlugin({
           filename : 'assets.json',
-          path : path.join(__dirname,'../server'),
+          path : path.join(__dirname,'../server/conf'),
           update : false
       }),
+      //提取框架库
       new webpack.optimize.CommonsChunkPlugin({
           name : 'vendor',
           minChunks: Infinity
       }),
+      //提取webpack环境声明的方法
       new webpack.optimize.CommonsChunkPlugin({
           name: 'manifest',
           chunks: ['vendor']
@@ -95,7 +83,7 @@ var config = {
 
 if (isProduction) {
   console.log('delete dist');
-  deleteFolderRecursive(path.resolve(__dirname, './dist'))
+  rimraf.sync(path.resolve(__dirname, './dist/*'));
   console.log('delete complete');
 
   config.devtool = '#source-map'
@@ -112,7 +100,13 @@ if (isProduction) {
         warnings: false
       }
     }),
-    new ExtractTextPlugin('css/[name].[contenthash].css')
+    new ExtractTextPlugin('css/[name].[contenthash].css'),
+    //压缩提取出的css
+    new OptimizeCSSPlugin({
+      cssProcessorOptions: {
+          safe: true
+      }
+    }),
   ])
 }
 
@@ -123,7 +117,5 @@ files.forEach(function(f){
 
     config.entry[name] = f;
 });
-
-console.log(config.entry)
 
 module.exports = config;

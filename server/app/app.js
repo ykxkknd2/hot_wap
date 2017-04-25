@@ -1,7 +1,9 @@
+var log4js = require('log4js');
+var log = require('./public/log');
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
 var hbs = require('express-hbs');
 var helper = require('./public/helpers');
 var cookieParser = require('cookie-parser');
@@ -12,6 +14,8 @@ var api = require('./routes/api');
 
 var app = express();
 
+app.disable('x-powered-by');
+
 // view engine setup
 app.engine('hbs', hbs.express3({
     viewsDir    : path.join(__dirname, 'views'),
@@ -21,12 +25,16 @@ app.engine('hbs', hbs.express3({
 }));
 app.set('view engine', 'hbs');
 app.set('views',path.join(__dirname,'/views'));
+app.set('view cache',true);
 
 app.locals.title = '热门';
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+// app.use(log(app.get('env')));
+app.use(log4js.connectLogger(log, {
+    level : 'auto'
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -53,5 +61,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+if(app.get('env') == 'development'){
+    app.set('view cache',false)
+}
 
 module.exports = app;

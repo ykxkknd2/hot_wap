@@ -1,0 +1,13 @@
+{
+	"apps" : [
+	{
+		"name": "lepc",
+			"script": "app/bin/www",
+			"env": {
+				"NODE_ENV": "production",
+				"logs_dir": "d:/logs"
+			},
+			"instances":8
+	}
+	]
+}
